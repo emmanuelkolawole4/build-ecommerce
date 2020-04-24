@@ -60,7 +60,9 @@ class UI {
 
 // local storage 
 class Storage {
-
+    static saveProducts(products) {
+        localStorage.setItem('products', JSON.stringify(products));
+    }
 }
 
 // event listeners
@@ -71,6 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // get all products
     products.getProducts().then(products => {
         console.table(products);
+        
+        // display them
         ui.displayProducts(products);
+
+        // save to local storage
+        Storage.saveProducts(products);
     });
 });
