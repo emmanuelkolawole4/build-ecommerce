@@ -1,3 +1,10 @@
+const client = contentful.createClient({
+    // This is the space ID. A space is like a project folder in Contentful terms
+    space: "vtbacegsoac2",
+    // This is the access token for this space. Normally you get both ID and the token in the Contentful web app
+    accessToken: "kARwBWjj0O_x2h9ptSnNyZ6C7sJ2Nc3B22JHIUtBaQc"
+});
+
 // DOM variables
 const cartBtn = document.querySelector('.cart-btn');
 const closeCartBtn = document.querySelector('.close-cart');
@@ -20,9 +27,17 @@ let buttonsDOM = [];
 class Products {
     async getProducts() {
         try {
-            let result = await fetch(productsLocalURL);
-            let data = await result.json();
-            let products = data.items;
+            let contentful = await client.getEntries({
+                content_type: 'comfyHouseProductExample'
+            });
+
+            // local data
+            // let result = await fetch(productsLocalURL);
+            // let data = await result.json();
+            // let products = data.items;
+
+            // contentful data
+            let products = contentful.items;
             products = products.map(item => {
                 const { title, price } = item.fields; 
                 const { id } = item.sys;
@@ -76,11 +91,9 @@ class UI {
 
                 // get product from products
                 let cartItem = { ...Storage.getProduct(id), amount: 1 };
-                console.log(cartItem);
 
                 // add product to the cart
                 cart = [...cart, cartItem];
-                console.log(cart);
                 
                 // save the cart in local storage
                 Storage.saveCart(cart);
@@ -106,7 +119,6 @@ class UI {
         });
         cartTotal.innerText = parseFloat(tempTotal.toFixed(2));
         cartItems.innerText = itemsTotal;
-        console.log(cartTotal, cartItems);
     }
 
     addCartItem(item) {
@@ -245,8 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // get all products
     products.getProducts().then(products => {
-        console.table(products);
-        
         // display them
         ui.displayProducts(products);
 
